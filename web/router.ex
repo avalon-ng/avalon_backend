@@ -17,6 +17,8 @@ defmodule AvalonBackend.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/users", UserController, :index
+    post "/users/create", UserController, :create
   end
 
   # Other scopes may use custom stacks.

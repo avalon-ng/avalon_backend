@@ -12,6 +12,7 @@ defmodule AvalonBackend do
       supervisor(AvalonBackend.Endpoint, []),
       # Start your own worker by calling: AvalonBackend.Worker.start_link(arg1, arg2, arg3)
       # worker(AvalonBackend.Worker, [arg1, arg2, arg3]),
+      worker(AvalonBackend.ChannelMonitor, [%{}])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
