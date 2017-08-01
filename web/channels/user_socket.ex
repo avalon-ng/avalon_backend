@@ -27,16 +27,6 @@ defmodule AvalonBackend.UserSocket do
     {:ok, socket}
   end
 
-  # alias AvalonBackend.{Repo, User}
-  # def connect(%{"token" => token}, socket) do
-  #   case Phoenix.Token.verify(socket, "user", token, max_age: 86400) do
-  #     {:ok, user_id} ->
-  #       # socket = assign(socket, :current_user, Repo.get!(User, user_id))
-  #       {:ok, socket}
-  #     {:error, _} ->
-  #       :error
-  #   end
-  # end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:
   #
