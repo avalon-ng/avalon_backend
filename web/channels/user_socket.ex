@@ -21,6 +21,9 @@ defmodule AvalonBackend.UserSocket do
   # performing token verification on connect.
 
   def connect(_params, socket) do
+    id = Enum.random(0..1000)
+    user = %{ :id => id, :username => id }
+    socket = assign(socket, :current_user, user)
     {:ok, socket}
   end
 
