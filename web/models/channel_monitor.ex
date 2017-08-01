@@ -6,7 +6,7 @@ defmodule AvalonBackend.ChannelMonitor do
   end
 
   def user_joined(channel, user) do
-   GenServer.call(__MODULE__, {:user_joined, channel, user})
+    GenServer.call(__MODULE__, {:user_joined, channel, user})
   end
 
   def users_in_channel(channel) do
@@ -25,7 +25,6 @@ defmodule AvalonBackend.ChannelMonitor do
       users ->
         Map.put(state, channel, Enum.uniq([user | users]))
     end
-
     {:reply, new_state, new_state}
   end
 
