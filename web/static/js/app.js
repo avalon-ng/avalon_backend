@@ -19,8 +19,17 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
-import initSocket from "./socket"
+import { createSocket } from "./socket"
+
+let socket;
 
 document.getElementById('anonymousButton').addEventListener('click', () => {
-	initSocket();
+	socket = createSocket();
+})
+
+document.getElementById('submitButton').addEventListener('click', () => {
+	socket.sendMessage({ 
+		id : document.getElementById('idInput').value,
+		message : document.getElementById('messageInput').value
+	})
 })

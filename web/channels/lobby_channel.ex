@@ -6,7 +6,7 @@ defmodule AvalonBackend.LobbyChannel do
     current_user = socket.assigns.current_user
     users = ChannelMonitor.user_joined("game:lobby", current_user)["game:lobby"]
     send self(), {:after_join, users}
-    {:ok, socket}
+    {:ok, %{ id: current_user.id }, socket}
   end
 
   def terminate(_reason, socket) do

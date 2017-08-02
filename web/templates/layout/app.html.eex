@@ -29,6 +29,9 @@
         <%= render @view_module, @view_template, assigns %>
       </main>
       <button id="anonymousButton">Anonymous</button>
+      <input id="idInput" placeholder="id"></input>
+      <input id="messageInput" placeholder="message"></input>
+      <button id="submitButton">Submit</button>
 
     </div> <!-- /container -->
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>

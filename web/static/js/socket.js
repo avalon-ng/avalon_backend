@@ -5,22 +5,70 @@
 // and connect at the socket path in "lib/my_app/endpoint.ex":
 import {Socket} from "phoenix"
 
-const initSocket = () => {
-  let socket = new Socket("/socket", {params: {token: window.userToken}})
-  socket.connect()
-
-  let lobby = socket.channel('game:lobby');
-  lobby.on('lobby_update', function(response) {
+const initLobbyChannel = (socket) => {
+  let channel = socket.channel('game:lobby');
+  channel.on('lobby_update', function(response) {
     console.log(JSON.stringify(response.users));
   });
-  lobby.join()
-    .receive('ok', function() {
-      console.log('Connected to lobby!');
+  return new Promise((resolve, reject) => {
+    channel.join()
+      .receive('ok', (res) => {
+        const { id } = res;
+        console.log('Connected to lobby!');
+        resolve({ channel, id })
+      })
+      .receive('error', (e) => {
+        console.log(e);
+        reject(e);
+      })
+  })
+}
+
+const initUserChannel = ({socket, id}) => {
+  let channel = socket.channel('user:' + id);
+  channel.on('message', function(res) {
+    console.log(res.message);
+  });
+  channel.join()
+    .receive('ok', (res) => {
+      console.log('Connected to user:' + id);
     })
-    .receive('error', function(e) {
+    .receive('error', (e) => {
       console.log(e);
     })
+  return channel;
 }
+
+const createSocket = () => {
+  let socket = new Socket("/socket", {params: {token: window.userToken}})
+  let lobbyChannel;
+  let userChannel;
+
+  socket.connect()
+
+  initLobbyChannel(socket)
+    .then(({ channel, id }) => {
+      lobbyChannel = channel;
+      userChannel = initUserChannel({socket, id});
+    })
+  
+  const sendMessage = (args) => {
+    userChannel.push("message", args)
+      .receive('ok', () => console.log("success"))
+      .receive('error', (e) => console.log(e));
+  }
+
+  return {
+    sendMessage 
+  }
+}
+
+export {
+  createSocket
+}
+
+
+
 //let token = document.head.querySelector('meta[name=channel_token]').getAttribute('content');
 //let socket = new Socket('/socket', {params: {token: token}});
 
@@ -68,5 +116,3 @@ const initSocket = () => {
 // Finally, pass the token to the Socket constructor as above.
 // Or, remove it from the constructor if you don't care about
 // authentication.
-
-export default initSocket
