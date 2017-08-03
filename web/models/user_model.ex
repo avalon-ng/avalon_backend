@@ -1,4 +1,4 @@
-defmodule AvalonBackend.ChannelMonitor do
+defmodule AvalonBackend.UserModel do
   use GenServer
 
   def start_link(initial_state) do

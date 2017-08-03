@@ -32,6 +32,7 @@
       <input id="idInput" placeholder="id"></input>
       <input id="messageInput" placeholder="message"></input>
       <button id="submitButton">Submit</button>
+      <button id="createButton">Create</button>
 
     </div> <!-- /container -->
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>

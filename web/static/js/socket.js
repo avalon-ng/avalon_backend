@@ -10,6 +10,9 @@ const initLobbyChannel = (socket) => {
   channel.on('lobby_update', function(response) {
     console.log(JSON.stringify(response.users));
   });
+  channel.on('message', function(res) {
+    console.log(res.message);
+  });
   return new Promise((resolve, reject) => {
     channel.join()
       .receive('ok', (res) => {
@@ -40,9 +43,10 @@ const initUserChannel = ({socket, id}) => {
 }
 
 const createSocket = () => {
-  let socket = new Socket("/socket", {params: {token: window.userToken}})
+  let socket = new Socket('/socket', {params: {token: window.userToken}})
   let lobbyChannel;
   let userChannel;
+  let roomChannel;
 
   socket.connect()
 
@@ -53,13 +57,20 @@ const createSocket = () => {
     })
   
   const sendMessage = (args) => {
-    userChannel.push("message", args)
-      .receive('ok', () => console.log("success"))
+    userChannel.push('message', args)
+      .receive('ok', () => console.log('success'))
       .receive('error', (e) => console.log(e));
   }
 
+  const createRoom = (config = {}) => {
+    lobbyChannel.push('createRoom', config)
+      .receive('ok', (res) => console.log(res))
+      .receive('error', (e) => console.log(e))
+  }
+
   return {
-    sendMessage 
+    sendMessage,
+    createRoom 
   }
 }
 

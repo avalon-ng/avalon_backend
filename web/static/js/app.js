@@ -33,3 +33,7 @@ document.getElementById('submitButton').addEventListener('click', () => {
 		message : document.getElementById('messageInput').value
 	})
 })
+
+document.getElementById('createButton').addEventListener('click', () => {
+	socket.createRoom();
+})
