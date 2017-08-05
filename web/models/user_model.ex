@@ -17,7 +17,16 @@ defmodule AvalonBackend.UserModel do
     GenServer.call(__MODULE__, {:user_left, channel, user_id})
   end
 
-  # GenServer implementation
+  def change_user_state(user, :room, number) do
+    GenServer.call(__MODULE__, {:user_state_changed, user, number})
+  end
+
+
+  def handle_call({:user_state_changed, user, number}, _from, state) do
+    # TODO change user state
+    {:reply, state, state}
+  end
+
   def handle_call({:user_joined, channel, user}, _from, state) do
     new_state = case Map.get(state, channel) do
       nil ->

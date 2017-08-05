@@ -2,6 +2,11 @@ defmodule AvalonBackend.RoomChannel do
   use AvalonBackend.Web, :channel
   alias AvalonBackend.RoomModel
 
+  def join("room:" <> _number, _payload, socket) do
+    { :ok, socket }
+  end
+
+
   # def join("game:lobby", _payload, socket) do
   #   current_user = socket.assigns.current_user
   #   users = ChannelMonitor.user_joined("game:lobby", current_user)["game:lobby"]

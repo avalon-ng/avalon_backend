@@ -7,11 +7,14 @@ import {Socket} from "phoenix"
 
 const initLobbyChannel = (socket) => {
   let channel = socket.channel('game:lobby');
-  channel.on('lobby_update', function(response) {
-    console.log(JSON.stringify(response.users));
+  channel.on('lobby_update_users', function(res) {
+    console.log('lobby_update_users ', res.users);
+  });
+  channel.on('lobby_update_rooms', function(res) {
+    console.log('lobby_update_rooms ', res.rooms);
   });
   channel.on('message', function(res) {
-    console.log(res.message);
+    console.log('message ', res.message);
   });
   return new Promise((resolve, reject) => {
     channel.join()
@@ -30,7 +33,7 @@ const initLobbyChannel = (socket) => {
 const initUserChannel = ({socket, id}) => {
   let channel = socket.channel('user:' + id);
   channel.on('message', function(res) {
-    console.log(res.message);
+    console.log('message ', res.message);
   });
   channel.join()
     .receive('ok', (res) => {
@@ -68,9 +71,16 @@ const createSocket = () => {
       .receive('error', (e) => console.log(e))
   }
 
+  const joinRoom = (config = {}) => {
+    lobbyChannel.push('joinRoom', config)
+      .receive('ok', (res) => console.log(res))
+      .receive('error', (e) => console.log(e))
+  } 
+
   return {
     sendMessage,
-    createRoom 
+    createRoom,
+    joinRoom
   }
 }
 

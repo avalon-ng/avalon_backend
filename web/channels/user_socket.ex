@@ -5,6 +5,7 @@ defmodule AvalonBackend.UserSocket do
   # channel "room:*", AvalonBackend.RoomChannel
   channel "game:lobby", AvalonBackend.LobbyChannel
   channel "user:*", AvalonBackend.UserChannel
+  channel "room:*", AvalonBackend.RoomChannel
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
   # transport :longpoll, Phoenix.Transports.LongPoll

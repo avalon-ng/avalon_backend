@@ -33,6 +33,8 @@
       <input id="messageInput" placeholder="message"></input>
       <button id="submitButton">Submit</button>
       <button id="createButton">Create</button>
+      <input id="numberInput" placeholder="room number"></input>
+      <button id="joinButton">Join</button>
 
     </div> <!-- /container -->
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>

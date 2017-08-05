@@ -37,3 +37,9 @@ document.getElementById('submitButton').addEventListener('click', () => {
 document.getElementById('createButton').addEventListener('click', () => {
 	socket.createRoom();
 })
+
+document.getElementById('joinButton').addEventListener('click', () => {
+	socket.joinRoom({
+		number : document.getElementById('numberInput').value
+	})
+})
