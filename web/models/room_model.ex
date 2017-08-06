@@ -14,32 +14,32 @@ defmodule AvalonBackend.RoomModel do
   end
 
   def handle_call({:room_created, user}, _from, rooms) do
-
     # todo unique
     number = Integer.to_string Enum.random(0..1000)
-    
     room = create_room(number)
     room = add_user(room, user)
     rooms = update(rooms, number, room)
-
     {:reply, {rooms, room, number}, rooms}
-
   end
 
   def handle_call({:user_joined, number, user}, _from, rooms) do
-
-    room = add_user(rooms[number], user)
-    rooms = update(rooms, number, room)
-
-    {:reply, {:ok, rooms, room, number}, rooms}
+    room = rooms[number]
+    cond do
+      room.user_limit <= length(room.users) ->
+        {:reply, {:full}, rooms}
+      true -> 
+        room = add_user(rooms[number], user)
+        rooms = update(rooms, number, room)
+        {:reply, {:ok, rooms, room, number}, rooms}
+    end
   end
 
   defp update(state, key, value) do
     state = Map.put(state, key, value)
   end
-
+  
   defp create_room(number) do
-    room = %{ :users => [], :number => number }
+    room = %{ :users => [], :number => number, :user_limit => 10 }
   end
 
   defp add_user(room, user) do
