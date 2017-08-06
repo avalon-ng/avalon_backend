@@ -28,7 +28,7 @@ defmodule AvalonBackend.LobbyChannel do
     users = UserModel.change_user_state(user, %{ :room => number})
     AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
     lobby_update_all(%{ :users => users, :rooms => rooms })
-    {:noreply, socket}
+    {:reply, :ok, socket}
   end
   
   def handle_in("joinRoom", %{ "number" => number }, socket) do
@@ -39,10 +39,11 @@ defmodule AvalonBackend.LobbyChannel do
       {:ok, rooms, room, number} -> 
         users = UserModel.change_user_state(user, %{ :room => number})
         lobby_update_all(%{ :users => users, :rooms => rooms })
-      
+        {:reply, :ok, socket}
+      {:full} ->
+        {:reply, :full, socket}
     end
-    
-    {:noreply, socket}
+
   end
 
   defp lobby_update_all(%{:users => users, :rooms => rooms}) do

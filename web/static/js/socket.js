@@ -73,7 +73,8 @@ const createSocket = () => {
 
   const joinRoom = (config = {}) => {
     lobbyChannel.push('joinRoom', config)
-      .receive('ok', (res) => console.log(res))
+      .receive('ok', (res) => console.log("joined"))
+      .receive('full', () => console.log("full"))
       .receive('error', (e) => console.log(e))
   } 
 

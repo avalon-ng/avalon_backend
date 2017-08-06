@@ -19,7 +19,7 @@ defmodule AvalonBackend.RoomModel do
     number = Integer.to_string Enum.random(0..1000)
     
     room = create_room(number)
-    {_, room} = add_user(room, user)
+    room = add_user(room, user)
     rooms = update(rooms, number, room)
 
     {:reply, {rooms, room, number}, rooms}
@@ -28,7 +28,7 @@ defmodule AvalonBackend.RoomModel do
 
   def handle_call({:user_joined, number, user}, _from, rooms) do
 
-    {_, room} = add_user(rooms[number], user)
+    room = add_user(rooms[number], user)
     rooms = update(rooms, number, room)
 
     {:reply, {:ok, rooms, room, number}, rooms}
@@ -45,7 +45,6 @@ defmodule AvalonBackend.RoomModel do
   defp add_user(room, user) do
     users = room.users ++ [user.id]
     room = update(room, :users, users) 
-    {:ok, room}
   end
 
 end
