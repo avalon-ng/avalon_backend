@@ -5,6 +5,7 @@ defmodule AvalonBackend.UserModel do
     GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
+  def user_log_in(nil), do: {:error, "User is empty."}
   def user_log_in(user) do
     GenServer.call(__MODULE__, {:user_logged_in, user})
   end
@@ -28,22 +29,37 @@ defmodule AvalonBackend.UserModel do
   end
 
   def handle_call({:user_logged_in, user}, _from, users) do
-    {status, users} = update(users, user.id, user)
-    {:reply, users, users}
+    {status, users} = add(users, user.id, user)
+    {:reply, {status, users}, users}
   end
 
   def handle_call({:user_logged_out, user}, _from, users) do
     {status, users} = remove(users, user.id)
-    {:reply, users, users}
+    {:reply, {status, users}, users}
   end
 
   def handle_call({:users_in_channel, channel}, _from, state) do
     {:reply, Map.get(state, channel), state}
   end
 
+  defp add(state, key, value) do
+    case Map.get(state, key) do
+      nil -> 
+        state = Map.put(state, key, value)
+        {:ok, state}
+      _ -> 
+        {:error, "exist"}
+    end
+  end
+
   defp update(state, key, value) do
-    state = Map.put(state, key, value)
-    {:ok, state}
+    case Map.get(state,key) do
+      nil -> 
+        {:error, "non exist"}
+      _ -> 
+        state = Map.put(state, key, value)
+        {:ok, state}
+    end
   end
 
   defp remove(state, key) do

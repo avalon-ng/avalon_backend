@@ -18,11 +18,11 @@ defmodule AvalonBackend.RoomModel do
     # todo unique
     number = Integer.to_string Enum.random(0..1000)
 
-    {status, room} = create_room(number)
+    {:ok, room} = create_room(number)
     {status, room} = add_user(room, user)
     {status, rooms} = update(rooms, number, room)
+    {:reply, {status, rooms, room, number}, rooms}
 
-    {:reply, { rooms, room, number }, rooms}
   end
 
 
@@ -41,7 +41,7 @@ defmodule AvalonBackend.RoomModel do
 
   defp create_room(number) do
     room = %{ :users => [], :number => number }
-    {:ok, room}
+    {:error, room}
   end
 
   defp add_user(room, user) do

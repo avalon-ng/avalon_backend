@@ -4,15 +4,24 @@ defmodule AvalonBackend.LobbyChannel do
   alias AvalonBackend.UserModel
 
   def join("lobby", _payload, socket) do
-    user = socket.assigns.user
-    users = UserModel.user_log_in(user)
-    send self(), {:after_join, users}
-    {:ok, %{ id: user.id }, socket}
+
+    user = Map.get(socket.assigns, :user)
+    
+    case UserModel.user_log_in(user) do
+      {:ok, users} -> 
+        send self(), {:after_join, users}
+        {:ok, %{ id: user.id }, socket}
+      {:error, reason} ->
+        {:error, reason}
+      _ ->
+        {:error, "Unexpected error."}
+    end
+
   end
 
   def terminate(_reason, socket) do
     user = socket.assigns.user
-    users = UserModel.user_log_out(user)
+    {status, users} = UserModel.user_log_out(user)
     lobby_update_users(users)
     :ok
   end
@@ -25,7 +34,7 @@ defmodule AvalonBackend.LobbyChannel do
   def handle_in("createRoom", %{ }, socket) do
     user = socket.assigns.user
 
-    { rooms, room, number }  = RoomModel.create(user)
+    { status, rooms, room, number }  = RoomModel.create(user)
     users = UserModel.change_user_state(user, %{ :room => number})
 
     AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
@@ -38,7 +47,7 @@ defmodule AvalonBackend.LobbyChannel do
     user = socket.assigns.user
     
     users = UserModel.change_user_state(user, %{ :room => number})
-    { rooms, room, number } = RoomModel.join(number, user)
+    { status, rooms, room, number } = RoomModel.join(number, user)
     
     lobby_update_all(%{ :users => users, :rooms => rooms })
 
