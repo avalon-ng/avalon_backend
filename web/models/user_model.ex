@@ -5,12 +5,10 @@ defmodule AvalonBackend.UserModel do
     GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
-  def user_log_in(nil), do: {:error, "User is empty."}
   def user_log_in(user) do
     GenServer.call(__MODULE__, {:user_logged_in, user})
   end
 
-  def user_log_out(nil), do: {:error, "User is empty."}
   def user_log_out(user) do
     GenServer.call(__MODULE__, {:user_logged_out, user})
   end
@@ -20,60 +18,29 @@ defmodule AvalonBackend.UserModel do
   end
 
   def handle_call({:user_state_changed, user, state}, _from, users) do
-    {status, user} = update(user, :state, state)
-    {status, users} = update(users, user.id, user)
+    user = update(user, :state, state)
+    users = update(users, user.id, user)
     {:reply, users, users}
   end
 
   def handle_call({:user_logged_in, user}, _from, users) do
-    id = Map.get(user, :id)
-    case add(users, id, user) do
-      {:ok, users} ->
-        {:reply, {:ok, users}, users}
-      {:error, reason} ->
-        {:reply, {:error, reason}, users}
-      _ -> 
-        {:reply, {:error, "Unexpected Error"}, users}
-    end
+    id = user.id
+    users = update(users, id, user)
+    {:reply, users, users}
   end
 
   def handle_call({:user_logged_out, user}, _from, users) do
-    id = Map.get(user, :id)
-    case remove(users, id) do
-      {:ok, users} ->
-        {:reply, {:ok, users}, users}
-      {:error, reason} ->
-        {:reply, {:error, reason}, users}
-      _ -> 
-        {:reply, {:error, "Unexpected Error"}, users}
-    end
-  end
-
-  defp add(state, nil, value), do: {:error, "Key is nil."}
-  defp add(state, key, value) do
-    case Map.get(state, key) do
-      nil -> 
-        state = Map.put(state, key, value)
-        {:ok, state}
-      _ -> 
-        {:error, "Value exist."}
-    end
+    id = user.id
+    users = remove(users, id)
+    {:reply, users, users}
   end
 
   defp update(state, key, value) do
-    case Map.get(state,key) do
-      nil -> 
-        {:error, "non exist"}
-      _ -> 
-        state = Map.put(state, key, value)
-        {:ok, state}
-    end
+    Map.put(state, key, value)
   end
 
-  defp remove(state, nil), do: {:error, "Key is nil."}
   defp remove(state, key) do
-    state = Map.delete(state, key)
-    {:ok, state}
+    Map.delete(state, key)
   end
 
 end

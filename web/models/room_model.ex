@@ -5,7 +5,6 @@ defmodule AvalonBackend.RoomModel do
      GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
-  def create(nil), do: {:error, "User is empty."}
   def create(user) do
     GenServer.call(__MODULE__, {:room_created, user})
   end
@@ -19,63 +18,34 @@ defmodule AvalonBackend.RoomModel do
     # todo unique
     number = Integer.to_string Enum.random(0..1000)
     
-    {status_create_room, room} = create_room(number)
-    {status_add_user, room} = add_user(room, user)
-    {status_update, rooms} = 
-    if is_map(room) do
-      update(rooms, number, room)
-    else
-      {:error, rooms}
-    end
+    room = create_room(number)
+    {_, room} = add_user(room, user)
+    rooms = update(rooms, number, room)
 
-    case {status_create_room, status_add_user, status_update} do
-      {:ok, :ok, :ok} ->
-        {:reply, {:ok, rooms, room, number}, rooms}
-      {:error, _, _} ->
-        {:reply, {:error, "Create room error."}, rooms}
-      {:ok, :error, _} ->
-        {:reply, {:error, "Add user error."}, rooms}
-      {:ok, :ok, :error} ->
-        {:reply, {:error, "Update rooms error."}, rooms}
-      _ ->
-        {:reply, {:error, "Unexpected error."}, rooms}
-    end
+    {:reply, {rooms, room, number}, rooms}
 
   end
 
-
   def handle_call({:user_joined, number, user}, _from, rooms) do
 
-    {status, room} = add_user(rooms[number], user)
-    {status, rooms} = update(rooms, number, room)
+    {_, room} = add_user(rooms[number], user)
+    rooms = update(rooms, number, room)
 
-    {:reply, {rooms, room, number}, rooms}
+    {:reply, {:ok, rooms, room, number}, rooms}
   end
 
   defp update(state, key, value) do
     state = Map.put(state, key, value)
-    {:ok, state}
   end
 
   defp create_room(number) do
     room = %{ :users => [], :number => number }
-    {:ok, room}
   end
 
-  defp add_user(room, user) when is_map(room) and is_map(user) do
+  defp add_user(room, user) do
     users = room.users ++ [user.id]
-    case update(room, :users, users) do
-      {:ok, room} -> 
-        {:ok, room}
-      {:error, reason} ->
-        {:error, reason}
-      _ ->
-        {:error, "Unexpected error."}
-    end
-  end
-  
-  defp add_user(_, _) do 
-    {:error, "Error arguments."}  
+    room = update(room, :users, users) 
+    {:ok, room}
   end
 
 end
