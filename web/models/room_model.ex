@@ -17,11 +17,28 @@ defmodule AvalonBackend.RoomModel do
 
     # todo unique
     number = Integer.to_string Enum.random(0..1000)
+    
+    {status_create_room, room} = create_room(number)
+    {status_add_user, room} = add_user(room, user)
+    {status_update, rooms} = 
+    if is_map(room) do
+      update(rooms, number, room)
+    else
+      {:error, rooms}
+    end
 
-    {:ok, room} = create_room(number)
-    {status, room} = add_user(room, user)
-    {status, rooms} = update(rooms, number, room)
-    {:reply, {status, rooms, room, number}, rooms}
+    case {status_create_room, status_add_user, status_update} do
+      {:ok, :ok, :ok} ->
+        {:reply, {:ok, rooms, room, number}, rooms}
+      {:error, _, _} ->
+        {:reply, {:error, "Create room error."}, rooms}
+      {:ok, :error, _} ->
+        {:reply, {:error, "Add user error."}, rooms}
+      {:ok, :ok, :error} ->
+        {:reply, {:error, "Update rooms error."}, rooms}
+      _ ->
+        {:reply, {:error, "Unexpected error."}, rooms}
+    end
 
   end
 
@@ -41,13 +58,23 @@ defmodule AvalonBackend.RoomModel do
 
   defp create_room(number) do
     room = %{ :users => [], :number => number }
-    {:error, room}
+    {:ok, room}
   end
 
-  defp add_user(room, user) do
+  defp add_user(room, user) when is_map(room) and is_map(user) do
     users = room.users ++ [user.id]
-    {status, room} = update(room, :users, users)
-    {:ok, room}
+    case update(room, :users, users) do
+      {:ok, room} -> 
+        {:ok, room}
+      {:error, reason} ->
+        {:error, reason}
+      _ ->
+        {:error, "Unexpected error."}
+    end
+  end
+  
+  defp add_user(_, _) do 
+    {:error, "Error arguments."}  
   end
 
 end

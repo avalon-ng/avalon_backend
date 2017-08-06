@@ -34,13 +34,18 @@ defmodule AvalonBackend.LobbyChannel do
   def handle_in("createRoom", %{ }, socket) do
     user = socket.assigns.user
 
-    { status, rooms, room, number }  = RoomModel.create(user)
-    users = UserModel.change_user_state(user, %{ :room => number})
+    case RoomModel.create(user) do
+      {:ok, rooms, room, number } ->
+        users = UserModel.change_user_state(user, %{ :room => number})
+        AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
+        lobby_update_all(%{ :users => users, :rooms => rooms })
+        {:noreply, socket}
+      {:error, reason} ->
+        {:reply, {:error, %{ :reason => reason }}, socket}
+      _ ->
+        {:reply, {:error, %{ :reason => "Unexpected error" }}, socket}
+    end
 
-    AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
-
-    lobby_update_all(%{ :users => users, :rooms => rooms })
-    {:noreply, socket}
   end
   
   def handle_in("joinRoom", %{ "number" => number }, socket) do
