@@ -5,20 +5,20 @@ defmodule AvalonBackend.LobbyChannel do
 
   def join("game:lobby", _payload, socket) do
     user = socket.assigns.user
-    users = UserModel.user_joined("game:lobby", user)["game:lobby"]
+    users = UserModel.user_log_in(user)
     send self(), {:after_join, users}
     {:ok, %{ id: user.id }, socket}
   end
 
   def terminate(_reason, socket) do
     user_id = socket.assigns.user.id
-    users = UserModel.user_left("game:lobby", user_id)["game:lobby"]
-    lobby_update_users(socket, users)
+    users = UserModel.user_log_out(user_id)
+    lobby_update_users(users)
     :ok
   end
 
   def handle_info({:after_join, users}, socket) do
-    lobby_update_users(socket, users)
+    lobby_update_users(users)
     {:noreply, socket}
   end
 
@@ -30,7 +30,7 @@ defmodule AvalonBackend.LobbyChannel do
 
     AvalonBackend.Endpoint.broadcast "game:lobby", "message", %{ message: room }
 
-    lobby_update_all(socket, %{ :users => users, :rooms => rooms })
+    lobby_update_all(%{ :users => users, :rooms => rooms })
     {:noreply, socket}
   end
   
@@ -40,26 +40,27 @@ defmodule AvalonBackend.LobbyChannel do
     { rooms, room, number } = RoomModel.join(number, user)
     users = UserModel.change_user_state(user, :room, number )
     
-    lobby_update_all(socket, %{ :users => users, :rooms => rooms })
+    lobby_update_all(%{ :users => users, :rooms => rooms })
 
     # AvalonBackend.Endpoint.broadcast "room:" <> number , "join", %{ user: user }
     {:noreply, socket}
   end
 
-  defp lobby_update_all(socket, args) do
+  defp lobby_update_all(args) do
     users = args[:users]
     rooms = args[:rooms]
-    lobby_update_rooms(socket, rooms)
-    lobby_update_users(socket, users)
+    lobby_update_rooms(rooms)
+    lobby_update_users(users)
   end
 
-  defp lobby_update_rooms(socket, rooms) do
-    broadcast! socket, "lobby_update_rooms", %{ rooms: get_rooms(rooms) }
+  defp lobby_update_rooms(rooms) do
+    AvalonBackend.Endpoint.broadcast "game:lobby", "lobby_update_rooms", %{ rooms: get_rooms(rooms)}
   end
 
-  defp lobby_update_users(socket, users) do
-    broadcast! socket, "lobby_update_users", %{ users: get_users(users) }
+  defp lobby_update_users(users) do
+    AvalonBackend.Endpoint.broadcast "game:lobby", "lobby_update_users", %{ users: get_users(users) }
   end
+
 
   defp get_rooms(nil), do: []
   defp get_rooms(rooms) do

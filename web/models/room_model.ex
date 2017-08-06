@@ -2,15 +2,15 @@ defmodule AvalonBackend.RoomModel do
   use GenServer
 
   def start_link(initial_state) do
-   	GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
+     GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
-	def create(user) do
+  def create(user) do
     GenServer.call(__MODULE__, {:room_created, user})
   end
   
   def join(number, user) do
-  	GenServer.call(__MODULE__, {:user_joined, number, user})
+    GenServer.call(__MODULE__, {:user_joined, number, user})
   end
 
   def handle_call({:room_created, user}, _from, rooms) do

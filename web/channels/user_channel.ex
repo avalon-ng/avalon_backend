@@ -5,9 +5,9 @@ defmodule AvalonBackend.UserChannel do
     {:ok, socket}
   end
 
-	def handle_in("message", %{"id" => id, "message" => message }, socket) do
-		AvalonBackend.Endpoint.broadcast "user:" <> id, "message", %{ message: message }
-		{:noreply, socket}
-	end
+  def handle_in("message", %{"id" => id, "message" => message }, socket) do
+    AvalonBackend.Endpoint.broadcast "user:" <> id, "message", %{ message: message }
+    {:noreply, socket}
+  end
 
 end
