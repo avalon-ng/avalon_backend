@@ -11,8 +11,8 @@ defmodule AvalonBackend.LobbyChannel do
   end
 
   def terminate(_reason, socket) do
-    user_id = socket.assigns.user.id
-    users = UserModel.user_log_out(user_id)
+    user = socket.assigns.user
+    users = UserModel.user_log_out(user)
     lobby_update_users(users)
     :ok
   end

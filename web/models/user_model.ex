@@ -13,8 +13,8 @@ defmodule AvalonBackend.UserModel do
     GenServer.call(__MODULE__, {:users_in_channel, channel})
   end
 
-  def user_log_out(user_id) do
-    GenServer.call(__MODULE__, {:user_logged_out, user_id})
+  def user_log_out(user) do
+    GenServer.call(__MODULE__, {:user_logged_out, user})
   end
 
   def change_user_state(user, :room, number) do
@@ -28,9 +28,15 @@ defmodule AvalonBackend.UserModel do
   end
 
   def handle_call({:user_logged_in, user}, _from, users) do
-    id = user[:id]
-    users = Map.put(users, id, users)
+    id = user.id
+    users = Map.put(users, id, user)
 
+    {:reply, users, users}
+  end
+
+  def handle_call({:user_logged_out, user}, _from, users) do
+    id = user.id
+    users = Map.delete(users, id)
     {:reply, users, users}
   end
 
@@ -38,8 +44,5 @@ defmodule AvalonBackend.UserModel do
     {:reply, Map.get(state, channel), state}
   end
 
-  def handle_call({:user_logged_out, user_id}, _from, users) do
-    users =  Map.delete(users, user_id)
-    {:reply, users, users}
-  end
+
 end

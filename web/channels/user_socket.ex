@@ -24,7 +24,7 @@ defmodule AvalonBackend.UserSocket do
 
   def connect(_params, socket) do
     id = Enum.random(0..1000)
-    user = %{ :id => id, :username => id }
+    user = %{ :id => id, :username => id, :log_in_time => DateTime.utc_now() }
     socket = assign(socket, :user, user)
     {:ok, socket}
   end
