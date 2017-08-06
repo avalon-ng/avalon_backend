@@ -22,22 +22,18 @@ defmodule AvalonBackend.UserModel do
   end
 
   def handle_call({:user_state_changed, user, state}, _from, users) do
-    user = update(user, :state, state)
-    id = user.id 
-    users = update(users, id, user)
+    {status, user} = update(user, :state, state)
+    {status, users} = update(users, user.id, user)
     {:reply, users, users}
   end
 
   def handle_call({:user_logged_in, user}, _from, users) do
-    id = user.id
-    users = update(users, id, user)
-
+    {status, users} = update(users, user.id, user)
     {:reply, users, users}
   end
 
   def handle_call({:user_logged_out, user}, _from, users) do
-    id = user.id
-    users = remove(users, id)
+    {status, users} = remove(users, user.id)
     {:reply, users, users}
   end
 
@@ -47,10 +43,12 @@ defmodule AvalonBackend.UserModel do
 
   defp update(state, key, value) do
     state = Map.put(state, key, value)
+    {:ok, state}
   end
 
   defp remove(state, key) do
     state = Map.delete(state, key)
+    {:ok, state}
   end
 
 end
