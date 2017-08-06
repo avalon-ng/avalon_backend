@@ -17,14 +17,15 @@ defmodule AvalonBackend.UserModel do
     GenServer.call(__MODULE__, {:user_logged_out, user})
   end
 
-  def change_user_state(user, :room, number) do
-    GenServer.call(__MODULE__, {:user_state_changed, user, number})
+  def change_user_state(user, state) do
+    GenServer.call(__MODULE__, {:user_state_changed, user, state})
   end
 
-
-  def handle_call({:user_state_changed, user, number}, _from, state) do
-    # TODO change user state
-    {:reply, state, state}
+  def handle_call({:user_state_changed, user, state}, _from, users) do
+    user = update(user, :state, state)
+    id = user.id 
+    users = update(users, id, user)
+    {:reply, users, users}
   end
 
   def handle_call({:user_logged_in, user}, _from, users) do
