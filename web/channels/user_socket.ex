@@ -3,7 +3,7 @@ defmodule AvalonBackend.UserSocket do
 
   ## Channels
   # channel "room:*", AvalonBackend.RoomChannel
-  channel "game:lobby", AvalonBackend.LobbyChannel
+  channel "lobby", AvalonBackend.LobbyChannel
   channel "user:*", AvalonBackend.UserChannel
   channel "room:*", AvalonBackend.RoomChannel
   ## Transports
@@ -24,7 +24,7 @@ defmodule AvalonBackend.UserSocket do
 
   def connect(_params, socket) do
     id = Enum.random(0..1000)
-    user = %{ :id => id, :username => id, :log_in_time => DateTime.utc_now() }
+    user = %{ :id => id, :username => id, :log_in_time => DateTime.utc_now(), :state => :lobby }
     socket = assign(socket, :user, user)
     {:ok, socket}
   end

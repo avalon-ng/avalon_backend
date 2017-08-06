@@ -6,7 +6,7 @@
 import {Socket} from "phoenix"
 
 const initLobbyChannel = (socket) => {
-  let channel = socket.channel('game:lobby');
+  let channel = socket.channel('lobby');
   channel.on('lobby_update_users', function(res) {
     console.log('lobby_update_users ', res.users);
   });
