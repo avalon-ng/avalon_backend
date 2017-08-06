@@ -5,18 +5,23 @@ defmodule AvalonBackend.RoomModel do
      GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
+  def create(user, args) do
+    GenServer.call(__MODULE__, {:room_created, user, args})
+  end
+
   def create(user) do
-    GenServer.call(__MODULE__, {:room_created, user})
+    GenServer.call(__MODULE__, {:room_created, user, %{}})
   end
   
   def join(number, user) do
     GenServer.call(__MODULE__, {:user_joined, number, user})
   end
 
-  def handle_call({:room_created, user}, _from, rooms) do
+  def handle_call({:room_created, user, args}, _from, rooms) do
     # todo unique
     number = Integer.to_string Enum.random(0..1000)
     room = create_room(number)
+    room = set_room_config(room, args)
     room = add_user(room, user)
     rooms = update(rooms, number, room)
     {:reply, {rooms, room, number}, rooms}
@@ -37,7 +42,12 @@ defmodule AvalonBackend.RoomModel do
   defp update(state, key, value) do
     state = Map.put(state, key, value)
   end
-  
+
+  defp set_room_config(room, args) do
+    room = Enum.map(room, fn {k, v} -> {k, v} end) ++ Enum.map(args, fn {k, v} -> {k, v} end) 
+    room = Enum.into(room, %{})
+  end
+
   defp create_room(number) do
     room = %{ :users => [], :number => number, :user_limit => 10 }
   end
