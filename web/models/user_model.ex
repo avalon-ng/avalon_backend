@@ -29,14 +29,14 @@ defmodule AvalonBackend.UserModel do
 
   def handle_call({:user_logged_in, user}, _from, users) do
     id = user.id
-    users = Map.put(users, id, user)
+    users = update(users, id, user)
 
     {:reply, users, users}
   end
 
   def handle_call({:user_logged_out, user}, _from, users) do
     id = user.id
-    users = Map.delete(users, id)
+    users = remove(users, id)
     {:reply, users, users}
   end
 
@@ -44,5 +44,12 @@ defmodule AvalonBackend.UserModel do
     {:reply, Map.get(state, channel), state}
   end
 
+  defp update(state, key, value) do
+    state = Map.put(state, key, value)
+  end
+
+  defp remove(state, key) do
+    state = Map.delete(state, key)
+  end
 
 end
