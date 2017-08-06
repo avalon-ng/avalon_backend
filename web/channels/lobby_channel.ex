@@ -6,7 +6,7 @@ defmodule AvalonBackend.LobbyChannel do
   def join("lobby", _payload, socket) do
 
     user = Map.get(socket.assigns, :user)
-    
+
     case UserModel.user_log_in(user) do
       {:ok, users} -> 
         send self(), {:after_join, users}
@@ -55,9 +55,7 @@ defmodule AvalonBackend.LobbyChannel do
     {:noreply, socket}
   end
 
-  defp lobby_update_all(args) do
-    users = args[:users]
-    rooms = args[:rooms]
+  defp lobby_update_all(%{:users => users, :rooms => rooms}) do
     lobby_update_rooms(rooms)
     lobby_update_users(users)
   end

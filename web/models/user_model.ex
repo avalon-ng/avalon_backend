@@ -10,10 +10,6 @@ defmodule AvalonBackend.UserModel do
     GenServer.call(__MODULE__, {:user_logged_in, user})
   end
 
-  def users_in_channel(channel) do
-    GenServer.call(__MODULE__, {:users_in_channel, channel})
-  end
-
   def user_log_out(user) do
     GenServer.call(__MODULE__, {:user_logged_out, user})
   end
@@ -29,8 +25,18 @@ defmodule AvalonBackend.UserModel do
   end
 
   def handle_call({:user_logged_in, user}, _from, users) do
-    {status, users} = add(users, user.id, user)
-    {:reply, {status, users}, users}
+
+    id = Map.get(user, :id)
+
+    case add(users, id, user) do
+      {:ok, users} ->
+        {:reply, {:ok, users}, users}
+      {:error, reason} ->
+        {:reply, {:error, reason}, users}
+      _ -> 
+        {:reply, {:error, "Unexpected Error"}, users}
+    end
+
   end
 
   def handle_call({:user_logged_out, user}, _from, users) do
@@ -38,17 +44,14 @@ defmodule AvalonBackend.UserModel do
     {:reply, {status, users}, users}
   end
 
-  def handle_call({:users_in_channel, channel}, _from, state) do
-    {:reply, Map.get(state, channel), state}
-  end
-
+  defp add(state, nil, value), do: {:error, "Key is nil."}
   defp add(state, key, value) do
     case Map.get(state, key) do
       nil -> 
         state = Map.put(state, key, value)
         {:ok, state}
       _ -> 
-        {:error, "exist"}
+        {:error, "Value exist."}
     end
   end
 
