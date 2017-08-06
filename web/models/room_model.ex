@@ -5,6 +5,7 @@ defmodule AvalonBackend.RoomModel do
      GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
+  def create(nil), do: {:error, "User is empty."}
   def create(user) do
     GenServer.call(__MODULE__, {:room_created, user})
   end

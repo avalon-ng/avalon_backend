@@ -10,6 +10,7 @@ defmodule AvalonBackend.UserModel do
     GenServer.call(__MODULE__, {:user_logged_in, user})
   end
 
+  def user_log_out(nil), do: {:error, "User is empty."}
   def user_log_out(user) do
     GenServer.call(__MODULE__, {:user_logged_out, user})
   end
@@ -25,9 +26,7 @@ defmodule AvalonBackend.UserModel do
   end
 
   def handle_call({:user_logged_in, user}, _from, users) do
-
     id = Map.get(user, :id)
-
     case add(users, id, user) do
       {:ok, users} ->
         {:reply, {:ok, users}, users}
@@ -36,12 +35,18 @@ defmodule AvalonBackend.UserModel do
       _ -> 
         {:reply, {:error, "Unexpected Error"}, users}
     end
-
   end
 
   def handle_call({:user_logged_out, user}, _from, users) do
-    {status, users} = remove(users, user.id)
-    {:reply, {status, users}, users}
+    id = Map.get(user, :id)
+    case remove(users, id) do
+      {:ok, users} ->
+        {:reply, {:ok, users}, users}
+      {:error, reason} ->
+        {:reply, {:error, reason}, users}
+      _ -> 
+        {:reply, {:error, "Unexpected Error"}, users}
+    end
   end
 
   defp add(state, nil, value), do: {:error, "Key is nil."}
@@ -65,6 +70,7 @@ defmodule AvalonBackend.UserModel do
     end
   end
 
+  defp remove(state, nil), do: {:error, "Key is nil."}
   defp remove(state, key) do
     state = Map.delete(state, key)
     {:ok, state}
