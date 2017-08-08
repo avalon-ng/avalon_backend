@@ -44,12 +44,25 @@ defmodule AvalonBackend.RoomModel do
   end
 
   defp set_room_config(room, args) do
-    room = Enum.map(room, fn {k, v} -> {k, v} end) ++ Enum.map(args, fn {k, v} -> {k, v} end) 
-    room = Enum.into(room, %{})
+    room = Map.merge(room, args)
   end
 
   defp create_room(number) do
-    room = %{ :users => [], :number => number, :user_limit => 10 }
+    room = %{ 
+      :creater => nil,
+      :state => :idle,
+      :password => nil,
+      :users => [], 
+      :watchers => [],
+      :number => number,
+      :watch_limit => true, 
+      :user_limit => 10, 
+      :login_limit => false,
+      :config => %{
+        :goddess => false,
+        :roles => []
+      }
+    }
   end
 
   defp add_user(room, user) do

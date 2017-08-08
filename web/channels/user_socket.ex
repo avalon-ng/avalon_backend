@@ -27,7 +27,7 @@ defmodule AvalonBackend.UserSocket do
     # TODO unique
     id = Enum.random(0..1000)
 
-    user = %{ :id => id, :username => id, :log_in_time => DateTime.utc_now(), :state => :lobby }
+    user = %{ :id => id, :username => id, :log_in_time => DateTime.utc_now(), :state => :idle, :number => :lobby }
     socket = assign(socket, :user, user)
     
     {:ok, socket}
