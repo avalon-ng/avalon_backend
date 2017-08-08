@@ -37,6 +37,8 @@ defmodule AvalonBackend.RoomModel do
         {:reply, {:full}, rooms}
       user.number !== :lobby ->
         {:reply, {:exist}, rooms}
+      user.login !== room.login_limit ->
+        {:reply, {:login_limit}, rooms}
       true -> 
         room = add_user(rooms[number], user)
         rooms = update(rooms, number, room)

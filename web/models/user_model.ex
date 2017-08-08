@@ -39,7 +39,14 @@ defmodule AvalonBackend.UserModel do
   end
 
   def handle_call({:user_logged_in, id}, _from, users) do
-    user = %{ :id => id, :username => id, :log_in_time => DateTime.utc_now(), :state => :idle, :number => :lobby }
+    user = %{ 
+      :id => id, 
+      :username => id, 
+      :log_in_time => DateTime.utc_now(), 
+      :state => :idle, 
+      :number => :lobby,
+      :login => false 
+    }
     users = update(users, id, user)
     {:reply, users, users}
   end

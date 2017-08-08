@@ -76,6 +76,7 @@ const createSocket = () => {
       .receive('ok', (res) => console.log("joined"))
       .receive('full', () => console.log("full"))
       .receive('exist', () => {console.log('already joined')})
+      .receive('login_limit', () => console.log('login limit'))
       .receive('error', (e) => console.log(e))
   } 
 
