@@ -75,6 +75,7 @@ const createSocket = () => {
     lobbyChannel.push('joinRoom', config)
       .receive('ok', (res) => console.log("joined"))
       .receive('full', () => console.log("full"))
+      .receive('exist', () => {console.log('already joined')})
       .receive('error', (e) => console.log(e))
   } 
 

@@ -25,10 +25,9 @@ defmodule AvalonBackend.UserSocket do
   def connect(_params, socket) do
 
     # TODO unique
-    id = Enum.random(0..1000)
+    id = Integer.to_string(Enum.random(0..1000))
 
-    user = %{ :id => id, :username => id, :log_in_time => DateTime.utc_now(), :state => :idle, :number => :lobby }
-    socket = assign(socket, :user, user)
+    socket = assign(socket, :id, id)
     
     {:ok, socket}
   end
@@ -44,5 +43,8 @@ defmodule AvalonBackend.UserSocket do
   #     AvalonBackend.Endpoint.broadcast("users_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
-  def id(_socket), do: nil
+  def id(socket) do 
+    socket.assigns.id
+  end
+
 end

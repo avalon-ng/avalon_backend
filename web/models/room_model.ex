@@ -1,24 +1,26 @@
 defmodule AvalonBackend.RoomModel do
   use GenServer
+  alias AvalonBackend.UserModel
 
   def start_link(initial_state) do
      GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
-  def create(user, args) do
-    GenServer.call(__MODULE__, {:room_created, user, args})
+  def create(id, args) do
+    GenServer.call(__MODULE__, {:room_created, id, args})
   end
 
-  def create(user) do
-    GenServer.call(__MODULE__, {:room_created, user, %{}})
+  def create(id) do
+    GenServer.call(__MODULE__, {:room_created, id, %{}})
   end
   
-  def join(number, user) do
-    GenServer.call(__MODULE__, {:user_joined, number, user})
+  def join(number, id) do
+    GenServer.call(__MODULE__, {:user_joined, number, id})
   end
 
-  def handle_call({:room_created, user, args}, _from, rooms) do
+  def handle_call({:room_created, id, args}, _from, rooms) do
     # todo unique
+    user = UserModel.get(id)
     number = Integer.to_string Enum.random(0..1000)
     room = create_room(number)
     room = set_room_config(room, args)
@@ -27,11 +29,14 @@ defmodule AvalonBackend.RoomModel do
     {:reply, {rooms, room, number}, rooms}
   end
 
-  def handle_call({:user_joined, number, user}, _from, rooms) do
+  def handle_call({:user_joined, number, id}, _from, rooms) do
+    user = UserModel.get(id)
     room = rooms[number]
     cond do
       room.user_limit <= length(room.users) ->
         {:reply, {:full}, rooms}
+      user.number !== :lobby ->
+        {:reply, {:exist}, rooms}
       true -> 
         room = add_user(rooms[number], user)
         rooms = update(rooms, number, room)

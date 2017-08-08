@@ -4,15 +4,15 @@ defmodule AvalonBackend.LobbyChannel do
   alias AvalonBackend.UserModel
 
   def join("lobby", _payload, socket) do
-    user = socket.assigns.user
-    users = UserModel.user_log_in(user) 
+    id = socket.id
+    users = UserModel.user_log_in(id) 
     send self(), {:after_join, users}
-    {:ok, %{ id: user.id }, socket}
+    {:ok, %{ id: id }, socket}
   end
 
   def terminate(_reason, socket) do
-    user = socket.assigns.user
-    users = UserModel.user_log_out(user) 
+    id = socket.id
+    users = UserModel.user_log_out(id) 
     lobby_update_users(users)
     :ok
   end
@@ -23,9 +23,9 @@ defmodule AvalonBackend.LobbyChannel do
   end
 
   def handle_in("createRoom", %{ }, socket) do
-    user = socket.assigns.user
-    {rooms, room, number} = RoomModel.create(user)
-    users = UserModel.update(user, %{:number => number})
+    id = socket.id
+    {rooms, room, number} = RoomModel.create(id)
+    users = UserModel.update(id, %{:number => number})
     AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
     lobby_update_all(%{ :users => users, :rooms => rooms })
     {:reply, :ok, socket}
@@ -33,15 +33,17 @@ defmodule AvalonBackend.LobbyChannel do
   
   def handle_in("joinRoom", %{ "number" => number }, socket) do
 
-    user = socket.assigns.user
+    id = socket.id
     
-    case RoomModel.join(number, user) do
+    case RoomModel.join(number, id) do
       {:ok, rooms, room, number} -> 
-        users = UserModel.update(user, %{:number => number})
+        users = UserModel.update(id, %{:number => number})
         lobby_update_all(%{ :users => users, :rooms => rooms })
         {:reply, :ok, socket}
       {:full} ->
         {:reply, :full, socket}
+      {:exist} ->
+        {:reply, :exist, socket}
     end
 
   end
