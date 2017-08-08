@@ -18,6 +18,10 @@ defmodule AvalonBackend.RoomModel do
     GenServer.call(__MODULE__, {:user_joined, number, id})
   end
 
+  def watch(number, id) do
+    GenServer.call(__MODULE__, {:user_watched, number, id})
+  end
+
   def handle_call({:room_created, id, args}, _from, rooms) do
     # todo unique
     user = UserModel.get(id)
@@ -46,6 +50,23 @@ defmodule AvalonBackend.RoomModel do
     end
   end
 
+  def handle_call({:user_watched, number, id}, _from, rooms) do
+    user = UserModel.get(id)
+    room = rooms[number]
+    cond do
+      room.watch_limit ->
+        {:reply, {:watch_limit}, rooms}
+      user.number !== :lobby ->
+        {:reply, {:exist}, rooms}
+      user.login !== room.login_limit ->
+        {:reply, {:login_limit}, rooms}
+      true -> 
+        room = add_watcher(rooms[number], user)
+        rooms = update(rooms, number, room)
+        {:reply, {:ok, rooms, room, number}, rooms}
+    end
+  end
+
   defp update(state, key, value) do
     state = Map.put(state, key, value)
   end
@@ -62,7 +83,7 @@ defmodule AvalonBackend.RoomModel do
       :users => [], 
       :watchers => [],
       :number => number,
-      :watch_limit => true, 
+      :watch_limit => false, 
       :user_limit => 10, 
       :login_limit => false,
       :config => %{
@@ -75,6 +96,11 @@ defmodule AvalonBackend.RoomModel do
   defp add_user(room, user) do
     users = room.users ++ [user.id]
     room = update(room, :users, users) 
+  end
+
+  defp add_watcher(room, watcher) do
+    watchers = room.watchers ++ [watcher.id]
+    room = update(room, :watchers, watchers) 
   end
 
 end

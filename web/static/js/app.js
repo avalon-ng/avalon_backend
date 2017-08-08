@@ -43,3 +43,9 @@ document.getElementById('joinButton').addEventListener('click', () => {
 		number : document.getElementById('numberInput').value
 	})
 })
+
+document.getElementById('watchButton').addEventListener('click', () => {
+	socket.watchRoom({
+		number : document.getElementById('numberInput').value
+	})
+})

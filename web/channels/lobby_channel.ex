@@ -50,6 +50,22 @@ defmodule AvalonBackend.LobbyChannel do
 
   end
 
+  def handle_in("watchRoom", %{ "number" => number }, socket) do
+    id = socket.id
+    case RoomModel.watch(number, id) do
+      {:ok, rooms, room, number} -> 
+        users = UserModel.update(id, %{:number => number, :state => :watch})
+        lobby_update_all(%{ :users => users, :rooms => rooms })
+        {:reply, :ok, socket}
+      {:exist} ->
+        {:reply, :exist, socket}
+      {:watch_limit} ->
+        {:reply, :watch_limit, socket}
+      {:login_limit} ->
+        {:reply, :login_limit, socket}
+    end
+  end
+
   defp lobby_update_all(%{:users => users, :rooms => rooms}) do
     lobby_update_rooms(rooms)
     lobby_update_users(users)

@@ -80,10 +80,20 @@ const createSocket = () => {
       .receive('error', (e) => console.log(e))
   } 
 
+  const watchRoom = (config = {}) => {
+    lobbyChannel.push('watchRoom', config)
+      .receive('ok', (res) => console.log("joined"))
+      .receive('watch_limit', () => console.log('watch limit'))
+      .receive('exist', () => {console.log('already joined')})
+      .receive('login_limit', () => console.log('login limit'))
+      .receive('error', (e) => console.log(e))
+  }
+
   return {
     sendMessage,
     createRoom,
-    joinRoom
+    joinRoom,
+    watchRoom
   }
 }
 

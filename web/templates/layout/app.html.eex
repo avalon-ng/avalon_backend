@@ -35,6 +35,7 @@
       <button id="createButton">Create</button>
       <input id="numberInput" placeholder="room number"></input>
       <button id="joinButton">Join</button>
+      <button id="watchButton">Watch</button>
 
     </div> <!-- /container -->
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
