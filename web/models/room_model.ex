@@ -65,6 +65,8 @@ defmodule AvalonBackend.RoomModel do
     user = UserModel.get(id)
     room = rooms[number]
     cond do
+      Map.get(rooms, number) === nil -> 
+        {:reply, {:error}, rooms} 
       room.user_limit <= length(room.users) ->
         {:reply, {:full}, rooms}
       user.number !== :lobby ->
@@ -82,6 +84,8 @@ defmodule AvalonBackend.RoomModel do
     user = UserModel.get(id)
     room = rooms[number]
     cond do
+      Map.get(rooms, number) === nil -> 
+        {:reply, {:error}, rooms} 
       room.watch_limit ->
         {:reply, {:watch_limit}, rooms}
       user.number !== :lobby ->

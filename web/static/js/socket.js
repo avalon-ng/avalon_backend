@@ -105,7 +105,7 @@ const createSocket = () => {
       .receive('full', () => console.log("full"))
       .receive('exist', () => {console.log('already joined')})
       .receive('login_limit', () => console.log('login limit'))
-      .receive('error', (e) => console.log(e))
+      .receive('error', (e) => console.log('join fail'))
   } 
 
   const watchRoom = (config = {}) => {
@@ -116,7 +116,7 @@ const createSocket = () => {
       .receive('watch_limit', () => console.log('watch limit'))
       .receive('exist', () => {console.log('already joined')})
       .receive('login_limit', () => console.log('login limit'))
-      .receive('error', (e) => console.log(e))
+      .receive('error', (e) => console.log('watch fail'))
   }
 
   const leaveRoom = (config = {}) => {

@@ -45,6 +45,8 @@ defmodule AvalonBackend.LobbyChannel do
         {:reply, :exist, socket}
       {:login_limit} ->
         {:reply, :login_limit, socket}
+      _ ->
+        {:reply, :error, socket} 
     end
   end
 
@@ -60,7 +62,9 @@ defmodule AvalonBackend.LobbyChannel do
       {:watch_limit} ->
         {:reply, :watch_limit, socket}
       {:login_limit} ->
-        {:reply, :login_limit, socket}
+        {:reply, :login_limit, socket}      
+      _ ->
+        {:reply, :error, socket} 
     end
   end
 
