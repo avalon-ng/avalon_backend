@@ -81,7 +81,7 @@ defmodule AvalonBackend.RoomModel do
         {:reply, {:error}, rooms} 
       room.user_limit <= length(room.users) ->
         {:reply, {:full}, rooms}
-      user.number !== :lobby ->
+      user.number !== :lobby || user.state !== :idle ->
         {:reply, {:exist}, rooms}
       user.login !== room.login_limit ->
         {:reply, {:login_limit}, rooms}
@@ -100,7 +100,7 @@ defmodule AvalonBackend.RoomModel do
         {:reply, {:error}, rooms} 
       room.watch_limit ->
         {:reply, {:watch_limit}, rooms}
-      user.number !== :lobby ->
+      user.number !== :lobby || user.state !== :idle ->
         {:reply, {:exist}, rooms}
       user.login !== room.login_limit ->
         {:reply, {:login_limit}, rooms}

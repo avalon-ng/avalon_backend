@@ -25,11 +25,17 @@ defmodule AvalonBackend.LobbyChannel do
 
   def handle_in("createRoom", %{ }, socket) do
     id = socket.id
-    {rooms, room, number} = RoomModel.create(id)
-    users = UserModel.update(id, %{:number => number})
-    # AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
-    lobby_update_all(%{ :users => users, :rooms => rooms })
-    {:reply, {:ok, %{:number => number}}, socket}
+    user = UserModel.get(id)
+    cond do
+      user.number === :lobby && user.state === :idle -> 
+        {rooms, room, number} = RoomModel.create(id)
+        users = UserModel.update(id, %{:number => number})
+        # AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
+        lobby_update_all(%{ :users => users, :rooms => rooms })
+        {:reply, {:ok, %{:number => number}}, socket}
+      true ->
+        {:reply, :error, socket}
+    end
   end
   
   def handle_in("joinRoom", %{ "number" => number }, socket) do
@@ -82,7 +88,7 @@ defmodule AvalonBackend.LobbyChannel do
     users = UserModel.update(id, %{:state => :idle, :number => :lobby})
 
     room = rooms[number]
-    if Enum.count(room.users) === 0 && Enum.count(room.watchers) === 0 do
+    if room !== nil && Enum.count(room.users) === 0 && Enum.count(room.watchers) === 0 do
       rooms = RoomModel.delete_room(number)
     end
     {users, rooms}

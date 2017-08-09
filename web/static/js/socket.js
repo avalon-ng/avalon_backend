@@ -94,7 +94,9 @@ const createSocket = () => {
       .receive('ok', ({ number }) => {
         roomChannel = initRoomChannel({ socket, number });
       })
-      .receive('error', (e) => console.log(e))
+      .receive('error', (e) => {
+        console.log('Create room error');
+      })
   }
 
   const joinRoom = (config = {}) => {
