@@ -31,7 +31,8 @@
       <button id="anonymousButton">Anonymous</button>
       <input id="idInput" placeholder="id"></input>
       <input id="messageInput" placeholder="message"></input>
-      <button id="submitButton">Submit</button>
+      <button id="submitUserButton">Submit User</button>
+      <button id="submitRoomButton">Submit Room</button>
       <button id="createButton">Create</button>
       <input id="numberInput" placeholder="room number"></input>
       <button id="joinButton">Join</button>

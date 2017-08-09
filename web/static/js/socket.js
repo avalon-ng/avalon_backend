@@ -77,8 +77,14 @@ const createSocket = () => {
       userChannel = initUserChannel({socket, id});
     })
   
-  const sendMessage = (args) => {
+  const sendMessageToUser = (args) => {
     userChannel.push('message', args)
+      .receive('ok', () => console.log('success'))
+      .receive('error', (e) => console.log(e));
+  }
+
+  const sendMessageToRoom = (args) => {
+    roomChannel.push('message', args)
       .receive('ok', () => console.log('success'))
       .receive('error', (e) => console.log(e));
   }
@@ -123,7 +129,8 @@ const createSocket = () => {
   }
 
   return {
-    sendMessage,
+    sendMessageToUser,
+    sendMessageToRoom,
     createRoom,
     joinRoom,
     watchRoom,

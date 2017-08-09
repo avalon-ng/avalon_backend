@@ -27,9 +27,15 @@ document.getElementById('anonymousButton').addEventListener('click', () => {
 	socket = createSocket();
 })
 
-document.getElementById('submitButton').addEventListener('click', () => {
-	socket.sendMessage({ 
+document.getElementById('submitUserButton').addEventListener('click', () => {
+	socket.sendMessageToUser({ 
 		id : document.getElementById('idInput').value,
+		message : document.getElementById('messageInput').value
+	})
+})
+
+document.getElementById('submitRoomButton').addEventListener('click', () => {
+	socket.sendMessageToRoom({ 
 		message : document.getElementById('messageInput').value
 	})
 })

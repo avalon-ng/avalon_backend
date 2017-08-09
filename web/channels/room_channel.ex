@@ -6,13 +6,24 @@ defmodule AvalonBackend.RoomChannel do
   def join("room:" <> number, _payload, socket) do
     id = socket.id
     user = UserModel.get(id)
+    IO.inspect user
     AvalonBackend.Endpoint.broadcast "room:" <> number, "joined", %{ name: user.name }
     { :ok, socket }
   end
 
-  def handle_in("join", %{ }, socket) do
-    {:reply, :ok, socket}
+  def handle_in("message", %{ "message" => message }, socket) do
+    id = socket.id
+    user = UserModel.get(id)
+    number = user.number
+    cond do
+      RoomModel.get(number) !== nil ->
+        AvalonBackend.Endpoint.broadcast "room:" <> number, "message", %{ name: user.name, message: message }
+        {:reply, :ok,socket}
+      true ->
+        {:reply, :non_exist, socket}
+    end
   end
+
 
   # def join("game:lobby", _payload, socket) do
   #   current_user = socket.assigns.current_user

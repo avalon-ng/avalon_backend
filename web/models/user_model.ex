@@ -27,7 +27,7 @@ defmodule AvalonBackend.UserModel do
   end
 
   def handle_call({:get, id}, _from, users) do
-    {:reply, users[id], users}
+    {:reply, Map.get(users, id), users}
   end
 
   def handle_call({:user_state_changed, id, state}, _from, users) do

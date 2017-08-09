@@ -22,6 +22,14 @@ defmodule AvalonBackend.RoomModel do
     GenServer.call(__MODULE__, {:user_watched, number, id})
   end
 
+  def get(number) do
+    GenServer.call(__MODULE__, {:get, number})
+  end
+
+  def handle_call({:get, number}, _from, rooms) do
+    {:reply, Map.get(rooms, number), rooms}
+  end
+  
   def handle_call({:room_created, id, args}, _from, rooms) do
     # todo unique
     user = UserModel.get(id)
