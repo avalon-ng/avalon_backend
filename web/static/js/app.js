@@ -49,3 +49,7 @@ document.getElementById('watchButton').addEventListener('click', () => {
 		number : document.getElementById('numberInput').value
 	})
 })
+
+document.getElementById('leaveButton').addEventListener('click', () => {
+	socket.leaveRoom()
+})

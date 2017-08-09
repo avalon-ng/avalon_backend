@@ -41,7 +41,7 @@ defmodule AvalonBackend.UserModel do
   def handle_call({:user_logged_in, id}, _from, users) do
     user = %{ 
       :id => id, 
-      :username => id, 
+      :name => id, 
       :log_in_time => DateTime.utc_now(), 
       :state => :idle, 
       :number => :lobby,

@@ -1,11 +1,18 @@
 defmodule AvalonBackend.RoomChannel do
   use AvalonBackend.Web, :channel
   alias AvalonBackend.RoomModel
+  alias AvalonBackend.UserModel
 
-  def join("room:" <> _number, _payload, socket) do
+  def join("room:" <> number, _payload, socket) do
+    id = socket.id
+    user = UserModel.get(id)
+    AvalonBackend.Endpoint.broadcast "room:" <> number, "joined", %{ name: user.name }
     { :ok, socket }
   end
 
+  def handle_in("join", %{ }, socket) do
+    {:reply, :ok, socket}
+  end
 
   # def join("game:lobby", _payload, socket) do
   #   current_user = socket.assigns.current_user

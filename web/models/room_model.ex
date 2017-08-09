@@ -76,6 +76,10 @@ defmodule AvalonBackend.RoomModel do
   end
 
   defp create_room(number) do
+    config = %{
+      :goddess => false,
+      :roles => []
+    }
     room = %{ 
       :creater => nil,
       :state => :idle,
@@ -86,10 +90,7 @@ defmodule AvalonBackend.RoomModel do
       :watch_limit => false, 
       :user_limit => 10, 
       :login_limit => false,
-      :config => %{
-        :goddess => false,
-        :roles => []
-      }
+      :config => config
     }
   end
 

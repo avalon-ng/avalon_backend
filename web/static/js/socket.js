@@ -45,6 +45,24 @@ const initUserChannel = ({socket, id}) => {
   return channel;
 }
 
+const initRoomChannel = ({ socket, number }) => {
+  let channel = socket.channel('room:' + number);
+  channel.on('joined', function({ name }) {
+    console.log('user ', name, ' join');
+  });
+  channel.on('message', function(res) {
+    console.log('message ', res.message);
+  });
+  channel.join()
+    .receive('ok', (res) => {
+      console.log('Connected to room:' + number);
+    })
+    .receive('error', (e) => {
+      console.log(e);
+    })
+  return channel;
+}
+
 const createSocket = () => {
   let socket = new Socket('/socket', {params: {token: window.userToken}})
   let lobbyChannel;
@@ -67,13 +85,17 @@ const createSocket = () => {
 
   const createRoom = (config = {}) => {
     lobbyChannel.push('createRoom', config)
-      .receive('ok', (res) => console.log(res))
+      .receive('ok', ({ number }) => {
+        roomChannel = initRoomChannel({ socket, number });
+      })
       .receive('error', (e) => console.log(e))
   }
 
   const joinRoom = (config = {}) => {
     lobbyChannel.push('joinRoom', config)
-      .receive('ok', (res) => console.log("joined"))
+      .receive('ok', ({ number }) => {
+        roomChannel = initRoomChannel({ socket, number });
+      })
       .receive('full', () => console.log("full"))
       .receive('exist', () => {console.log('already joined')})
       .receive('login_limit', () => console.log('login limit'))
@@ -82,18 +104,30 @@ const createSocket = () => {
 
   const watchRoom = (config = {}) => {
     lobbyChannel.push('watchRoom', config)
-      .receive('ok', (res) => console.log("joined"))
+      .receive('ok', ({ number }) => {
+        roomChannel = initRoomChannel({ socket, number });
+      })
       .receive('watch_limit', () => console.log('watch limit'))
       .receive('exist', () => {console.log('already joined')})
       .receive('login_limit', () => console.log('login limit'))
       .receive('error', (e) => console.log(e))
   }
 
+  const leaveRoom = (config = {}) => {
+    // lobbyChannel.push('watchRoom', config)
+    //   .receive('ok', (res) => console.log("joined"))
+    //   .receive('watch_limit', () => console.log('watch limit'))
+    //   .receive('exist', () => {console.log('already joined')})
+    //   .receive('login_limit', () => console.log('login limit'))
+    //   .receive('error', (e) => console.log(e))
+  }
+
   return {
     sendMessage,
     createRoom,
     joinRoom,
-    watchRoom
+    watchRoom,
+    leaveRoom
   }
 }
 

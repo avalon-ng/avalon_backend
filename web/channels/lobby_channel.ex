@@ -26,9 +26,9 @@ defmodule AvalonBackend.LobbyChannel do
     id = socket.id
     {rooms, room, number} = RoomModel.create(id)
     users = UserModel.update(id, %{:number => number})
-    AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
+    # AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
     lobby_update_all(%{ :users => users, :rooms => rooms })
-    {:reply, :ok, socket}
+    {:reply, {:ok, %{:number => number}}, socket}
   end
   
   def handle_in("joinRoom", %{ "number" => number }, socket) do
@@ -39,7 +39,7 @@ defmodule AvalonBackend.LobbyChannel do
       {:ok, rooms, room, number} -> 
         users = UserModel.update(id, %{:number => number})
         lobby_update_all(%{ :users => users, :rooms => rooms })
-        {:reply, :ok, socket}
+        {:reply, {:ok, %{:number => number}}, socket}
       {:full} ->
         {:reply, :full, socket}
       {:exist} ->
@@ -56,7 +56,7 @@ defmodule AvalonBackend.LobbyChannel do
       {:ok, rooms, room, number} -> 
         users = UserModel.update(id, %{:number => number, :state => :watch})
         lobby_update_all(%{ :users => users, :rooms => rooms })
-        {:reply, :ok, socket}
+        {:reply, {:ok, %{:number => number}}, socket}
       {:exist} ->
         {:reply, :exist, socket}
       {:watch_limit} ->
