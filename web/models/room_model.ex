@@ -26,10 +26,30 @@ defmodule AvalonBackend.RoomModel do
     GenServer.call(__MODULE__, {:get, number})
   end
 
-  def handle_call({:get, number}, _from, rooms) do
-    {:reply, Map.get(rooms, number), rooms}
+  def leave_room(number, id) do
+    GenServer.call(__MODULE__, {:user_left, number, id})
   end
-  
+
+  def handle_call({:get, number}, _from, rooms) do
+    {:reply, get(rooms, number), rooms}
+  end
+
+  def handle_call({:user_left, number, id}, _from, rooms) do
+    room = get(rooms, number)
+    case room do
+      nil -> 
+        {:reply, rooms, rooms}
+      _ -> 
+        %{:watchers => watchers, :users => users} = room
+        watchers = watchers -- [id]
+        users = users -- [id]
+        room = update(room, :users, users)
+        room = update(room, :watchers, watchers)
+        rooms = update(rooms, number, room)
+        {:reply, rooms, rooms}
+    end
+  end
+
   def handle_call({:room_created, id, args}, _from, rooms) do
     # todo unique
     user = UserModel.get(id)
@@ -73,6 +93,10 @@ defmodule AvalonBackend.RoomModel do
         rooms = update(rooms, number, room)
         {:reply, {:ok, rooms, room, number}, rooms}
     end
+  end
+
+  defp get(state, key) do
+    Map.get(state, key)
   end
 
   defp update(state, key, value) do

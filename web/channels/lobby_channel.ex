@@ -12,8 +12,9 @@ defmodule AvalonBackend.LobbyChannel do
 
   def terminate(_reason, socket) do
     id = socket.id
+    {users, rooms} = leave_room(id)
     users = UserModel.user_log_out(id) 
-    lobby_update_users(users)
+    lobby_update_all(%{ :users => users, :rooms => rooms })
     :ok
   end
 
@@ -32,9 +33,7 @@ defmodule AvalonBackend.LobbyChannel do
   end
   
   def handle_in("joinRoom", %{ "number" => number }, socket) do
-
     id = socket.id
-    
     case RoomModel.join(number, id) do
       {:ok, rooms, room, number} -> 
         users = UserModel.update(id, %{:number => number})
@@ -47,7 +46,6 @@ defmodule AvalonBackend.LobbyChannel do
       {:login_limit} ->
         {:reply, :login_limit, socket}
     end
-
   end
 
   def handle_in("watchRoom", %{ "number" => number }, socket) do
@@ -64,6 +62,21 @@ defmodule AvalonBackend.LobbyChannel do
       {:login_limit} ->
         {:reply, :login_limit, socket}
     end
+  end
+
+  def handle_in("leaveRoom", %{}, socket) do
+    id = socket.id
+    {users, rooms} = leave_room(id)
+    lobby_update_all(%{ :users => users, :rooms => rooms })
+    {:reply, :ok, socket}
+  end
+
+  defp leave_room(id) do
+    user = UserModel.get(id)
+    number = user.number 
+    rooms = RoomModel.leave_room(number, id)
+    users = UserModel.update(id, %{:state => :idle, :number => :lobby})
+    {users, rooms}
   end
 
   defp lobby_update_all(%{:users => users, :rooms => rooms}) do

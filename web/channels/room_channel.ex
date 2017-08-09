@@ -6,7 +6,6 @@ defmodule AvalonBackend.RoomChannel do
   def join("room:" <> number, _payload, socket) do
     id = socket.id
     user = UserModel.get(id)
-    IO.inspect user
     AvalonBackend.Endpoint.broadcast "room:" <> number, "joined", %{ name: user.name }
     { :ok, socket }
   end
@@ -23,6 +22,16 @@ defmodule AvalonBackend.RoomChannel do
         {:reply, :non_exist, socket}
     end
   end
+
+  def terminate(_reason, socket) do
+    id = socket.id
+    user = UserModel.get(id)
+    number = user.number
+    AvalonBackend.Endpoint.broadcast "room:" <> number, "leaveRoom", %{ name: user.name }
+    :ok
+  end
+
+
 
 
   # def join("game:lobby", _payload, socket) do

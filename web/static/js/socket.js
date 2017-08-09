@@ -120,12 +120,16 @@ const createSocket = () => {
   }
 
   const leaveRoom = (config = {}) => {
-    // lobbyChannel.push('watchRoom', config)
-    //   .receive('ok', (res) => console.log("joined"))
-    //   .receive('watch_limit', () => console.log('watch limit'))
-    //   .receive('exist', () => {console.log('already joined')})
-    //   .receive('login_limit', () => console.log('login limit'))
-    //   .receive('error', (e) => console.log(e))
+    roomChannel.leave()
+      .receive("ok", () => {
+        console.log('leave room channel');
+        lobbyChannel.push('leaveRoom')
+          .receive('ok', () => {
+            console.log('lobbychannel leave room');
+          })
+          .receive('error', (e) => console.log(e))
+      })
+      .receive('error', (e) => console.log(e));
   }
 
   return {
