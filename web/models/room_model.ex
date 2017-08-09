@@ -30,6 +30,18 @@ defmodule AvalonBackend.RoomModel do
     GenServer.call(__MODULE__, {:user_left, number, id})
   end
 
+  def delete_room(number) do
+    GenServer.call(__MODULE__, {:delete_room, number})
+  end
+
+  def handle_call({:delete_room, number}, _from, rooms) do
+    room = get(rooms, number)
+    if Enum.count(room.users) === 0 && Enum.count(room.watchers) === 0 do
+      rooms = delete(rooms, number)
+    end
+    {:reply, rooms, rooms}
+  end
+
   def handle_call({:get, number}, _from, rooms) do
     {:reply, get(rooms, number), rooms}
   end
@@ -105,6 +117,10 @@ defmodule AvalonBackend.RoomModel do
 
   defp update(state, key, value) do
     state = Map.put(state, key, value)
+  end
+
+  defp delete(state, key) do
+    state = Map.delete(state, key)
   end
 
   defp set_room_config(room, args) do

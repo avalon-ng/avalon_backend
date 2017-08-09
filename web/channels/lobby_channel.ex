@@ -80,6 +80,11 @@ defmodule AvalonBackend.LobbyChannel do
     number = user.number 
     rooms = RoomModel.leave_room(number, id)
     users = UserModel.update(id, %{:state => :idle, :number => :lobby})
+
+    room = rooms[number]
+    if Enum.count(room.users) === 0 && Enum.count(room.watchers) === 0 do
+      rooms = RoomModel.delete_room(number)
+    end
     {users, rooms}
   end
 
