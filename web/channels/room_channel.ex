@@ -29,7 +29,16 @@ defmodule AvalonBackend.RoomChannel do
     number = user.number
     cond do
       RoomModel.get(number) !== nil ->
-        result = HTTPoison.post "localhost:4001/initGame", Poison.encode!(%{ :payload => %{ :users => [] }}), [{"Content-Type", "application/json"}] 
+        result = HTTPoison.post(
+          "localhost:4001", 
+          Poison.encode!(%{ 
+            :type => "initGame",
+            :payload => %{ 
+              :users => [] 
+            }
+          }), 
+          [{"Content-Type", "application/json"}]
+        )
         case result do
           {:ok, %HTTPoison.Response{body: body}} ->
             {:ok, body} = Poison.decode(body)
