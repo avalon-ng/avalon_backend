@@ -38,6 +38,7 @@
       <button id="joinButton">Join</button>
       <button id="watchButton">Watch</button>
       <button id="leaveButton">Leave</button>
+      <button id="startButton">Start</button>
 
     </div> <!-- /container -->
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>

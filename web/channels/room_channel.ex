@@ -23,11 +23,33 @@ defmodule AvalonBackend.RoomChannel do
     end
   end
 
-  def terminate(_reason, socket) do
+  def handle_in("startGame", %{}, socket) do
     id = socket.id
     user = UserModel.get(id)
     number = user.number
-    AvalonBackend.Endpoint.broadcast "room:" <> number, "leaveRoom", %{ name: user.name }
+    cond do
+      RoomModel.get(number) !== nil ->
+        result = HTTPoison.post "localhost:4001/initGame", Poison.encode!(%{ :payload => %{ :users => [] }}), [{"Content-Type", "application/json"}] 
+        case result do
+          {:ok, %HTTPoison.Response{body: body}} ->
+            {:ok, body} = Poison.decode(body)
+            {:reply, {:ok, body}, socket}
+          _ -> 
+            {:reply, :error, socket}
+        end
+      true ->
+        {:reply, :non_exist, socket}
+    end
+  end
+
+
+  def terminate(_reason, socket) do
+    id = socket.id
+    user = UserModel.get(id)
+    if user !== nil do
+      number = user.number
+      AvalonBackend.Endpoint.broadcast "room:" <> number, "leaveRoom", %{ name: user.name }
+    end
     :ok
   end
 

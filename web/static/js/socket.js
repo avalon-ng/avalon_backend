@@ -134,13 +134,22 @@ const createSocket = () => {
       .receive('error', (e) => console.log(e));
   }
 
+  const startGame = () => {
+    roomChannel.push('startGame')
+      .receive('ok', (resp) => {
+        console.log(resp);
+      })
+      .receive('error', (e) => console.log(e));
+  }
+
   return {
     sendMessageToUser,
     sendMessageToRoom,
     createRoom,
     joinRoom,
     watchRoom,
-    leaveRoom
+    leaveRoom,
+    startGame
   }
 }
 

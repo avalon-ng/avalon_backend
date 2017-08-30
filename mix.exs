@@ -19,7 +19,7 @@ defmodule AvalonBackend.Mixfile do
   def application do
     [
       mod: {AvalonBackend, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :httpoison]
     ]
   end
 
@@ -37,7 +37,9 @@ defmodule AvalonBackend.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:httpoison, "~> 0.13"},
+      {:poison, "~> 3.1"}
     ]
   end
 end

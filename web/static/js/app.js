@@ -57,5 +57,9 @@ document.getElementById('watchButton').addEventListener('click', () => {
 })
 
 document.getElementById('leaveButton').addEventListener('click', () => {
-	socket.leaveRoom()
+	socket.leaveRoom();
+})
+
+document.getElementById('startButton').addEventListener('click', () => {
+	socket.startGame();
 })
