@@ -46,7 +46,12 @@ defmodule AvalonBackend.RoomChannel do
         case result do
           {:ok, %HTTPoison.Response{body: body}} ->
             {:ok, body} = Poison.decode(body)
-            {:reply, {:ok, body}, socket}
+            %{ "status" => status } = body
+            if status === "fail" do
+              {:reply, {:invalid, body}, socket}
+            else
+              {:reply, {:ok, body}, socket}
+            end
           _ -> 
             {:reply, :error, socket}
         end

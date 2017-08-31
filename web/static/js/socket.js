@@ -137,7 +137,10 @@ const createSocket = () => {
   const startGame = () => {
     roomChannel.push('startGame')
       .receive('ok', (resp) => {
-        console.log(resp);
+        console.log('ok ', resp);
+      })
+      .receive('invalid', (resp) => {
+        console.log('invalid ', resp);
       })
       .receive('error', (e) => console.log(e));
   }
