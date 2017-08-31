@@ -28,15 +28,17 @@ defmodule AvalonBackend.RoomChannel do
     id = socket.id
     user = UserModel.get(id)
     number = user.number
+    room = RoomModel.get(number)
     cond do
-      RoomModel.get(number) !== nil ->
+      room !== nil ->
         fsm_server_url = Application.get_env(:avalon_backend, AvalonBackend.Endpoint)[:fsm_server_url]
+        users = init_roles(room.users, room.config.roles)
         result = HTTPoison.post(
           fsm_server_url, 
           Poison.encode!(%{ 
             :type => "initGame",
             :payload => %{ 
-              :users => [] 
+              :users => users 
             }
           }), 
           [{"Content-Type", "application/json"}]
@@ -53,7 +55,6 @@ defmodule AvalonBackend.RoomChannel do
     end
   end
 
-
   def terminate(_reason, socket) do
     id = socket.id
     user = UserModel.get(id)
@@ -66,7 +67,9 @@ defmodule AvalonBackend.RoomChannel do
 
 
 
-
+  defp init_roles(users, roles) do
+    users
+  end
   # def join("game:lobby", _payload, socket) do
   #   current_user = socket.assigns.current_user
   #   users = ChannelMonitor.user_joined("game:lobby", current_user)["game:lobby"]
