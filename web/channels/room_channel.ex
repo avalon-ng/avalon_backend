@@ -68,7 +68,18 @@ defmodule AvalonBackend.RoomChannel do
 
 
   defp init_roles(users, roles) do
-    users
+    roles = [%{ role: :Normal, align: 1 }]
+    # users 
+    #   |> Enum.with_index
+    #   |> Enum.each(fn ({user, index}) -> 
+    #     IO.inspect %{ id: user, align: roles[index].align, role: roles[index].role } 
+    #   end) 
+    users 
+      |> Enum.with_index
+      |> Enum.map(fn({user, index}) -> 
+        role = Enum.at(roles, index)
+        %{ id: user, align: role.align, role: role.role } 
+      end) 
   end
   # def join("game:lobby", _payload, socket) do
   #   current_user = socket.assigns.current_user
