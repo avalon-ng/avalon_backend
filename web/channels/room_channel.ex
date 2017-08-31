@@ -3,6 +3,7 @@ defmodule AvalonBackend.RoomChannel do
   alias AvalonBackend.RoomModel
   alias AvalonBackend.UserModel
 
+
   def join("room:" <> number, _payload, socket) do
     id = socket.id
     user = UserModel.get(id)
@@ -29,8 +30,9 @@ defmodule AvalonBackend.RoomChannel do
     number = user.number
     cond do
       RoomModel.get(number) !== nil ->
+        fsm_server_url = Application.get_env(:avalon_backend, AvalonBackend.Endpoint)[:fsm_server_url]
         result = HTTPoison.post(
-          "localhost:4001", 
+          fsm_server_url, 
           Poison.encode!(%{ 
             :type => "initGame",
             :payload => %{ 

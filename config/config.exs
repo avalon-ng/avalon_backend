@@ -11,7 +11,8 @@ config :avalon_backend, AvalonBackend.Endpoint,
   secret_key_base: "hxHLPRI89Qz5NVfbZVQ5u0Fgw/yXziL9yyMT6qdayRhaMjMhebVdcZr6PYacyXDx",
   render_errors: [view: AvalonBackend.ErrorView, accepts: ~w(html json)],
   pubsub: [name: AvalonBackend.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+           adapter: Phoenix.PubSub.PG2],
+  fsm_server_url: "localhost:4001"
 
 # Configures Elixir's Logger
 config :logger, :console,
