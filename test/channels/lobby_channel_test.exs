@@ -35,9 +35,21 @@ defmodule AvalonBackend.LobbyChannelTest do
     assert length(users) === 2
     assert Enum.at(users, 0) !== Enum.at(users, 1)
 
+    # join non exist room
+    player3 = connectLobby()
+    ref = push player3, "joinRoom", %{number: 1234567890}
+    assert_reply ref, :error
+
+    # join multiple room
+    creator2 = connectLobby()
+    number2 = createRoom(creator2)
+    player4 = connectLobby()
+    joinRoom(player4, number2)
+    ref = push player4, "joinRoom", %{number: number}
+    assert_reply ref, :exist
+
     # join room fail when amount reach limit
     makePlayers(number, 8)
-
     player11 = connectLobby()
     ref = push player11, "joinRoom", %{number: number}
     assert_reply ref, :full
