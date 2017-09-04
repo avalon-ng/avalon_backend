@@ -3,6 +3,7 @@ defmodule AvalonBackend.LobbyChannelTest do
   alias AvalonBackend.UserSocket
   alias AvalonBackend.LobbyChannel
   alias AvalonBackend.UserModel
+  alias AvalonBackend.RoomModel
 
   def connectLobby() do
     {:ok, socket} = connect(UserSocket, %{}) 
@@ -12,7 +13,20 @@ defmodule AvalonBackend.LobbyChannelTest do
 
   test "user connect and update user model" do
     socket = connectLobby()
-    assert socket.id !== "" && socket.id !== nil && IO.inspect UserModel.get(socket.id) !== nil
+    assert socket.id !== "" && socket.id !== nil && UserModel.get(socket.id) !== nil
+  end
+
+  test "create room" do
+    socket = connectLobby()
+    ref = push socket, "createRoom", %{}
+
+    assert_reply ref, :ok
+    user = UserModel.get(socket.id)
+
+    assert user.number !== :lobby
+    number = user.number
+
+    assert RoomModel.get(number) !== nil
   end
   
 end

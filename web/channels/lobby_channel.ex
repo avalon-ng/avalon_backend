@@ -30,7 +30,6 @@ defmodule AvalonBackend.LobbyChannel do
       user.number === :lobby && user.state === :idle -> 
         {rooms, room, number} = RoomModel.create(id)
         users = UserModel.update(id, %{:number => number})
-        # AvalonBackend.Endpoint.broadcast "lobby", "message", %{ message: room }
         lobby_update_all(%{ :users => users, :rooms => rooms })
         {:reply, {:ok, %{:number => number}}, socket}
       true ->
