@@ -63,11 +63,30 @@ const initRoomChannel = ({ socket, number }) => {
   return channel;
 }
 
+const initGameChannel = ({ socket, number }) => {
+  let channel = socket.channel('game:' + number);
+  channel.on('joined', function({ name }) {
+    console.log('user ', name, ' join');
+  });
+  channel.on('message', function(res) {
+    console.log('message ', res.message);
+  });
+  channel.join()
+    .receive('ok', (res) => {
+      console.log('Connected to game:' + number);
+    })
+    .receive('error', (e) => {
+      console.log(e);
+    })
+  return channel;
+}
+
 const createSocket = () => {
   let socket = new Socket('/socket', {params: {token: window.userToken}})
   let lobbyChannel;
   let userChannel;
   let roomChannel;
+  let gameChannel;
 
   socket.connect()
 
@@ -136,8 +155,8 @@ const createSocket = () => {
 
   const startGame = () => {
     roomChannel.push('startGame')
-      .receive('ok', (resp) => {
-        console.log('ok ', resp);
+      .receive('ok', ({ number }) => {
+        gameChannel = initGameChannel({socket, number});
       })
       .receive('invalid', (resp) => {
         console.log('invalid ', resp);

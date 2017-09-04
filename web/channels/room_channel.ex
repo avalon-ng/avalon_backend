@@ -1,8 +1,8 @@
 defmodule AvalonBackend.RoomChannel do
   use AvalonBackend.Web, :channel
   alias AvalonBackend.RoomModel
+  alias AvalonBackend.GameModel
   alias AvalonBackend.UserModel
-
 
   def join("room:" <> number, _payload, socket) do
     id = socket.id
@@ -50,7 +50,7 @@ defmodule AvalonBackend.RoomChannel do
             if status === "fail" do
               {:reply, {:invalid, body}, socket}
             else
-              {:reply, {:ok, body}, socket}
+              {:reply, {:ok, %{number: number}}, socket}
             end
           _ -> 
             {:reply, :error, socket}
