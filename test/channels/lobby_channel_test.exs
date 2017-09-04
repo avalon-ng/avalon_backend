@@ -23,7 +23,7 @@ defmodule AvalonBackend.LobbyChannelTest do
     number
   end
 
-  test "user connect and update user model" do
+  test "user connect" do
     socket = connectLobby()
     assert socket.id !== "" && socket.id !== nil 
     assert UserModel.get(socket.id) !== nil
@@ -35,6 +35,10 @@ defmodule AvalonBackend.LobbyChannelTest do
 
     assert UserModel.get(socket.id).number === number 
     assert RoomModel.get(number) !== nil
+    
+    # create room again without exit
+    ref = push socket, "createRoom", %{}
+    assert_reply ref, :error
   end
 
   test "join room" do
