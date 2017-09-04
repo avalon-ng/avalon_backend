@@ -70,47 +70,16 @@ defmodule AvalonBackend.RoomChannel do
     :ok
   end
 
-
-
   defp init_roles(users, roles) do
-    roles = [%{ role: :Normal, align: 1 }]
-    # users 
-    #   |> Enum.with_index
-    #   |> Enum.each(fn ({user, index}) -> 
-    #     IO.inspect %{ id: user, align: roles[index].align, role: roles[index].role } 
-    #   end) 
+    roles = [%{ role: :Test1, align: 1 }, %{ role: :Test2, align: -1 }, %{ role: :Test3, align: 1 }, %{ role: :Test4, align: -1 }, %{ role: :Test5, align: 1 }]
+    roles = Enum.shuffle roles 
     users 
+      |> Enum.shuffle
       |> Enum.with_index
       |> Enum.map(fn({user, index}) -> 
         role = Enum.at(roles, index)
         %{ id: user, align: role.align, role: role.role } 
       end) 
   end
-  # def join("game:lobby", _payload, socket) do
-  #   current_user = socket.assigns.current_user
-  #   users = ChannelMonitor.user_joined("game:lobby", current_user)["game:lobby"]
-  #   send self(), {:after_join, users}
-  #   {:ok, %{ id: current_user.id }, socket}
-  # end
 
-  # def terminate(_reason, socket) do
-  #   user_id = socket.assigns.current_user.id
-  #   users = ChannelMonitor.user_left("game:lobby", user_id)["game:lobby"]
-  #   lobby_update(socket, users)
-  #   :ok
-  # end
-
-  # def handle_info({:after_join, users}, socket) do
-  #   lobby_update(socket, users)
-  #   {:noreply, socket}
-  # end
-
-  # defp lobby_update(socket, users) do
-  #   broadcast! socket, "lobby_update", %{ users: get_usernames(users) }
-  # end
-
-  # defp get_usernames(nil), do: []
-  # defp get_usernames(users) do
-  #   Enum.map users, &(&1.username)
-  # end
 end
