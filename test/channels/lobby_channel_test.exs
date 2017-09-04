@@ -17,20 +17,37 @@ defmodule AvalonBackend.LobbyChannelTest do
     number
   end
 
+  def joinRoom(socket, number) do
+    ref = push socket, "joinRoom", %{number: number}
+    assert_reply ref, :ok, %{number: number}
+    number
+  end
+
   test "user connect and update user model" do
     socket = connectLobby()
-    assert socket.id !== "" && socket.id !== nil && UserModel.get(socket.id) !== nil
+    assert socket.id !== "" && socket.id !== nil 
+    assert UserModel.get(socket.id) !== nil
   end
 
   test "create room" do
     socket = connectLobby()
     number = createRoom(socket)
 
-    assert UserModel.get(socket.id).number === number && RoomModel.get(number) !== nil
+    assert UserModel.get(socket.id).number === number 
+    assert RoomModel.get(number) !== nil
   end
 
   test "join room" do
-    
+    creator = connectLobby()
+    number = createRoom(creator)
+
+    player2 = connectLobby()
+    joinRoom(player2, number)
+
+    room = RoomModel.get(number)
+    users = room.users
+    assert length(users) === 2
+    assert Enum.at(users, 0) !== Enum.at(users, 1)
   end
   
 end
