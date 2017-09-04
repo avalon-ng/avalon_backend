@@ -5,24 +5,6 @@ defmodule AvalonBackend.LobbyChannelTest do
   alias AvalonBackend.UserModel
   alias AvalonBackend.RoomModel
 
-  def connectLobby() do
-    {:ok, socket} = connect(UserSocket, %{}) 
-    {:ok, _, socket} = subscribe_and_join(socket, "lobby")
-    socket
-  end
-
-  def createRoom(socket) do
-    ref = push socket, "createRoom", %{}
-    assert_reply ref, :ok, %{number: number}
-    number
-  end
-
-  def joinRoom(socket, number) do
-    ref = push socket, "joinRoom", %{number: number}
-    assert_reply ref, :ok, %{number: number}
-    number
-  end
-
   test "user connect" do
     socket = connectLobby()
     assert socket.id !== "" && socket.id !== nil 
@@ -52,6 +34,43 @@ defmodule AvalonBackend.LobbyChannelTest do
     users = room.users
     assert length(users) === 2
     assert Enum.at(users, 0) !== Enum.at(users, 1)
+
+    # join room fail when amount reach limit
+    makePlayers(number, 8)
+
+    player11 = connectLobby()
+    ref = push player11, "joinRoom", %{number: number}
+    assert_reply ref, :full
+
   end
   
+  defp connectLobby() do
+    {:ok, socket} = connect(UserSocket, %{}) 
+    {:ok, _, socket} = subscribe_and_join(socket, "lobby")
+    socket
+  end
+
+  defp createRoom(socket) do
+    ref = push socket, "createRoom", %{}
+    assert_reply ref, :ok, %{number: number}
+    number
+  end
+
+  defp joinRoom(socket, number) do
+    ref = push socket, "joinRoom", %{number: number}
+    assert_reply ref, :ok, %{number: number}
+    number
+  end
+
+  defp makePlayers(number, count) when count <= 1 do
+    player = connectLobby()
+    joinRoom(player, number)
+  end
+
+  defp makePlayers(number, count) do
+    player = connectLobby()
+    joinRoom(player, number)
+    makePlayers(number, count-1)
+  end
+
 end
